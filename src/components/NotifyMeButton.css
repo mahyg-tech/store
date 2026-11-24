@@ -1,0 +1,26 @@
+.notify-btn--icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--color-teal-900);
+  background: transparent;
+  color: var(--color-teal-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notify-btn--icon:active {
+  background: var(--color-teal-100);
+}
+
+.notify-btn--icon.notify-btn--pending {
+  border-color: var(--color-olive-500);
+  color: var(--color-olive-600);
+  background: var(--color-olive-100);
+}
+
+.notify-btn:disabled {
+  cursor: default;
+}

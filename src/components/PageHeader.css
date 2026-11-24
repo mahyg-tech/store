@@ -1,0 +1,40 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: calc(var(--canopy-h) + var(--sp-2) + env(safe-area-inset-top, 0px)) var(--sp-4) var(--sp-3);
+  position: sticky;
+  top: 0;
+  background: var(--brand-deep);
+  color: var(--color-white);
+  box-shadow: 0 6px 14px rgba(6, 40, 24, 0.28);
+  z-index: 20;
+}
+
+.page-header__back {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-white);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--brand-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.page-header__title {
+  font-size: var(--fs-section);
+  font-weight: 800;
+  color: var(--color-white);
+  flex: 1;
+}
+
+.page-header__action {
+  flex-shrink: 0;
+}

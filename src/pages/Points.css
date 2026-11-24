@@ -1,0 +1,81 @@
+.points-page {
+  padding-top: var(--sp-4);
+  padding-bottom: var(--sp-6);
+}
+
+.points-balance-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  background: var(--color-mango-500);
+  border-radius: 16px;
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+
+.points-balance-card__label {
+  color: var(--color-white);
+  opacity: 0.9;
+  font-size: var(--fs-caption);
+  margin: 0 0 2px;
+}
+
+.points-balance-card__amount {
+  color: var(--color-white);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.points-page__section-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin: 0 0 var(--sp-3);
+}
+
+.points-transactions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.points-transactions__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: var(--sp-3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.points-transactions__type {
+  font-size: var(--fs-caption);
+  color: var(--color-ink-900);
+  margin: 0 0 2px;
+}
+
+.points-transactions__date {
+  font-size: 11.5px;
+  color: var(--color-ink-400);
+  margin: 0;
+}
+
+.points-transactions__amount {
+  font-weight: 700;
+  font-size: var(--fs-body);
+  white-space: nowrap;
+}
+
+.points-transactions__amount--credit {
+  color: #2f8a4e;
+}
+
+.points-transactions__amount--debit {
+  color: #c0392b;
+}

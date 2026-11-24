@@ -1,0 +1,115 @@
+.home-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-5) var(--sp-3);
+}
+
+.home-cat-card {
+  /* نفس مقاس كروت العروض بالظبط (.grid-promo-section__item) بدل شبكة
+     4 أعمدة ثابتة — القسم 3 لكل صف بدل 4، بنفس النسبة (90% من التلت) */
+  width: calc(((100% - 0 * var(--sp-3)) / 3) * 0.9);
+  border-radius: var(--radius-md);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-gray-100);
+  box-shadow: inset 0 0 0 1px rgba(19, 135, 63, 0.14);
+  overflow: visible; /* المظلة الصغيرة (.stall) بتطلع برّه الكارت */
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.home-cat-card:active {
+  transform: scale(0.95);
+  background: var(--color-gray-200);
+}
+
+.home-cat-card__icon {
+  flex-shrink: 0;
+}
+
+.home-cat-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  border-radius: inherit;
+}
+
+/* 3 أحجام ثابتة بيتحددوا من لوحة التحكم لكل قسم لوحده. مقاس مربع القسم
+   نفسه في الشبكة فاضل ثابت دايمًا (عشان الصفوف تفضل متظبطة)، والحجم
+   بيتحكم في مساحة الأيقونة/الصورة جوه المربع بس. الأيقونات (lucide) بيتغيّر
+   مقاسها فعليًا من الـ JS (شوف CATEGORY_ICON_PX في Home.jsx). للصور
+   المرفوعة يدويًا: medium وlarge بيملّوا المربع بالكامل (أقصى حجم ممكن،
+   زي الشكل القديم قبل الميزة دي)، وsmall بس بيصغّر الصورة جوه المربع. */
+.home-cat-card--small .home-cat-card__image {
+  width: 72%;
+  height: 72%;
+}
+
+.home-product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+}
+
+.home-rail-item {
+  flex: 0 0 auto;
+  width: 150px;
+  display: flex; /* كل الكروت بنفس الارتفاع عشان تقف على الرف بشكل مظبوط */
+}
+
+.home-rail-item > .product-card {
+  flex: 1;
+}
+
+/* كارت عرض جوه الرف: بنفس عرض كارت المنتج (150px) وبيتمدد لنفس ارتفاعه عشان
+   الرف يفضل متساوي — GridPromoCard الأساسي مربع (aspect-ratio) فبنلغيه هنا */
+.home-rail-item--promo > .grid-promo-card {
+  flex: 1;
+  aspect-ratio: auto;
+  min-height: 200px;
+}
+
+/* ------------------------------------------------------------------ */
+/* انبثاق الأقسام: كل قسم "بيطلع" من تحت بتكبير كبير مع ارتداد وميل     */
+/* واضح + هالة خضرا بتتوسّع وتختفي، وبيتأخر كل قسم عن اللي قبله شوية    */
+/* (--pop-i) فيطلعوا ورا بعض كموجة. بيشتغل أول ما التطبيق يفتح، وبيتعاد  */
+/* لما بوب أب الترحيب يتقفل ولما العميل يسحب لتحت للتحديث (Home.jsx).   */
+/* `backwards` (مش `both`) عن قصد: بعد ما الأنيميشن يخلص ماسيبش         */
+/* transform مفروض، عشان حالة :active (الضغط) تفضل شغالة.               */
+/* ------------------------------------------------------------------ */
+.home-cat-card--pop {
+  animation: home-cat-pop 1.15s cubic-bezier(0.34, 1.56, 0.5, 1) backwards;
+  animation-delay: calc(var(--pop-i, 0) * 90ms + 100ms);
+}
+
+@keyframes home-cat-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-30deg) translateY(110px);
+    box-shadow: inset 0 0 0 1px rgba(19, 135, 63, 0.14), 0 0 0 0 rgba(19, 135, 63, 0.55);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.32) rotate(8deg) translateY(-16px);
+  }
+  65% {
+    transform: scale(0.88) rotate(-4deg) translateY(4px);
+    box-shadow: inset 0 0 0 1px rgba(19, 135, 63, 0.14), 0 0 0 16px rgba(19, 135, 63, 0.18);
+  }
+  82% {
+    transform: scale(1.06) rotate(1.5deg) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0) translateY(0);
+    box-shadow: inset 0 0 0 1px rgba(19, 135, 63, 0.14), 0 0 0 34px rgba(19, 135, 63, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-cat-card--pop {
+    animation: none;
+  }
+}

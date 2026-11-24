@@ -1,0 +1,152 @@
+.pd {
+  padding-bottom: 120px;
+}
+
+.pd__media {
+  position: relative;
+}
+
+.pd__media--spotlight {
+  border-radius: var(--radius-lg);
+  animation: pd-spotlight-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pd-spotlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--color-mango-500); }
+  50% { box-shadow: 0 0 0 3px var(--color-tomato-500); }
+}
+
+.pd-dealtour {
+  background: var(--color-mango-50, #fdf3e3);
+  border: 1.5px solid var(--color-mango-500);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+}
+
+.pd-dealtour__badge {
+  display: inline-block;
+  background: var(--color-mango-500);
+  color: var(--color-white);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--sp-2);
+}
+
+.pd-dealtour__title {
+  font-weight: 700;
+  font-size: var(--fs-body);
+  color: var(--color-ink-900);
+}
+
+.pd-dealtour__desc {
+  color: var(--color-ink-600);
+  font-size: var(--fs-caption);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.pd__placeholder {
+  aspect-ratio: 1.4 / 1;
+  background: var(--color-sand-100);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--color-teal-500);
+  opacity: 0.5;
+}
+
+.pd__image {
+  width: 100%;
+  aspect-ratio: 1.4 / 1;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+.pd__badge {
+  position: absolute;
+  top: var(--sp-4);
+  left: var(--sp-4);
+}
+
+.pd__body {
+  margin-top: var(--sp-4);
+}
+
+.pd__name {
+  font-size: var(--fs-display-md);
+}
+
+.pd__units {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.pd__deal-hint {
+  background: var(--color-teal-50, #eaf5f3);
+  color: var(--color-teal-700);
+  font-weight: 600;
+  font-size: var(--fs-caption);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  margin-top: var(--sp-2);
+}
+
+.pd__deal-hint--gift {
+  background: var(--color-mango-50, #fdf3e3);
+  color: var(--color-mango-700, #8a5a00);
+}
+
+.pd__price-row {
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+}
+
+.pd__points {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-mango-600);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.pd__section {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--color-sand-200);
+}
+
+.pd__cta {
+  position: fixed;
+  /* فوق الشريط السفلي (اللي بقى ظاهر في كل الصفحات) مش تحته */
+  bottom: var(--bottom-nav-height);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--app-max-width);
+  background: var(--color-sand-50);
+  /* مسافة تحت زيادة عشان زرار السلة الدايري في الشريط بيطلع ~24px فوق حافته
+     وماينفعش يغطي على زرار الإضافة / عدّاد الكمية */
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-6) + var(--sp-2));
+  box-shadow: 0 -4px 16px rgba(15, 82, 87, 0.08);
+  z-index: 20; /* تحت الشريط السفلي (30) وفوق محتوى الصفحة */
+}
+
+.pd__cta-row {
+  background: var(--color-white);
+  border-radius: var(--radius-pill);
+  padding: var(--sp-2) var(--sp-4);
+  box-shadow: var(--shadow-card);
+}

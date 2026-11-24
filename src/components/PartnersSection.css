@@ -1,0 +1,64 @@
+/* صف شعارات "شركاء النجاح" — شعار دائري + اسم الشركة تحته، بيتلف أفقيًا
+   زي أي .scroll-x تاني في التطبيق (شوف theme/global.css). */
+.partners-row {
+  padding-bottom: var(--sp-2);
+}
+
+.partner-chip {
+  flex: none;
+  width: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  text-align: center;
+  color: inherit;
+  transition: transform 0.12s ease;
+}
+
+.partner-chip:active {
+  transform: scale(0.95);
+}
+
+.partner-chip__logo {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.partner-chip__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.partner-chip__initial {
+  font-size: var(--fs-title);
+  font-weight: 800;
+  color: var(--brand-strong);
+}
+
+.partner-chip__name {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-ink-700, var(--color-ink-600));
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.partner-chip--skeleton {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-pill);
+}

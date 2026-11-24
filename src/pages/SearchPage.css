@@ -1,0 +1,55 @@
+/* خانة البحث ثابتة فوق وإنت بتنزل في النتايج (زي هيدر الرئيسية) */
+.search-page__input-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0 calc(var(--sp-4) * -1) var(--sp-4);
+  padding: calc(var(--canopy-h) + var(--sp-2) + env(safe-area-inset-top, 0px)) var(--sp-4) var(--sp-3);
+  background: var(--brand-deep);
+  box-shadow: 0 6px 14px rgba(6, 40, 24, 0.28);
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% - 8px);
+  right: var(--sp-4);
+  left: var(--sp-4);
+  background: var(--color-white);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--shadow-float);
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  z-index: 20;
+  overflow: hidden;
+}
+
+.search-suggestions__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 10px var(--sp-4);
+  cursor: pointer;
+}
+
+.search-suggestions__item:hover {
+  background: var(--color-sand-100);
+}
+
+.search-suggestions__text {
+  flex: 1;
+  font-size: var(--fs-body);
+  color: var(--color-ink-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-suggestions__remove {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--color-ink-400);
+  cursor: pointer;
+  line-height: 0;
+}

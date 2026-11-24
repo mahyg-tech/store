@@ -1,0 +1,75 @@
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.confirm-card {
+  width: 100%;
+  max-width: 360px;
+  padding: var(--sp-5);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.confirm-card__title {
+  margin: 0 0 var(--sp-2);
+  font-weight: 800;
+  color: var(--color-ink-900);
+}
+
+.confirm-card__message {
+  margin: 0 0 var(--sp-3);
+  line-height: 1.7;
+}
+
+.confirm-card__field {
+  display: block;
+  margin-bottom: var(--sp-3);
+}
+
+.confirm-card__field span {
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-weight: 700;
+}
+
+.confirm-card__field textarea {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  font: inherit;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-md);
+  resize: none;
+  box-sizing: border-box;
+}
+
+.confirm-card__error {
+  margin: 0 0 var(--sp-3);
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.confirm-card__actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.confirm-card__actions .btn {
+  flex: 1;
+}
+
+.btn--danger {
+  background: #c0392b;
+  color: var(--color-white);
+}
+
+.btn--danger:disabled {
+  opacity: 0.5;
+}

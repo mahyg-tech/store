@@ -1,0 +1,71 @@
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+}
+
+.category-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  font-size: 13px;
+}
+
+.category-breadcrumb__link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--brand-strong);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.category-breadcrumb__sep {
+  color: var(--color-ink-400);
+}
+
+.category-breadcrumb__current {
+  color: var(--color-ink-600);
+}
+
+.category-subgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-5) var(--sp-3);
+}
+
+.category-subcat-card {
+  border-radius: var(--radius-md);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-gray-100);
+  box-shadow: inset 0 0 0 1px rgba(19, 135, 63, 0.14);
+  overflow: visible; /* المظلة الصغيرة (.stall) بتطلع برّه الكارت */
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.category-subcat-card:active {
+  transform: scale(0.95);
+  background: var(--color-gray-200);
+}
+
+.category-subcat-card__icon {
+  flex-shrink: 0;
+}
+
+.category-subcat-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  border-radius: inherit;
+}
+
+/* نفس منطق home-cat-card بالظبط (شوف Home.css) — مربع الشبكة ثابت
+   دايمًا، والحجم بيتحكم في مساحة الأيقونة/الصورة جوه المربع بس. */
+.category-subcat-card--small .category-subcat-card__image {
+  width: 72%;
+  height: 72%;
+}

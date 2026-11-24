@@ -1,0 +1,112 @@
+/* ==========================================================================
+   الماحي — تصميم تطبيق العملاء (Design Tokens)
+   هوية أحيا وأوضح: أخضر ورقي نابض (brand) + أخضر غابة غامق للعناصر التقيلة
+   + مانجو دافئ كلمسة تمييز بس (شارات/نجوم/تلميحات) + خلفية فاتحة جدًا.
+   كانت قبل كده تركواز رمادي مطفي (slate) — الألوان كانت باهتة وملهاش روح.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand (الأسماء الجديدة — استخدمها في أي كود جديد) ---- */
+  --brand: #13873f;             /* أخضر الهوية: الهيدر، الأزرار، العناصر النشطة */
+  --brand-strong: #0e7a3c;      /* نفس الأخضر أغمق شوية: hover/pressed + نصوص على فاتح */
+  --brand-deep: #0f4d32;        /* أخضر غابة: الأسعار، شريط السلة، الهيرو */
+  --brand-tint: #e3f4e9;        /* خلفية خضرا فاتحة جدًا: كروت الأقسام، الشارات */
+  --brand-tint-strong: #cfe9d8; /* نفس اللون وقت الضغط */
+
+  /* ---- Legacy names ----
+     الأسماء القديمة (teal / olive / gray) سايبينها زي ما هي عشان مانلمسش
+     ٤٠ ملف CSS — بس قيمها بقت تشاور على لوحة الألوان الجديدة فوق.
+     يعني "teal-900" دلوقتي هو أخضر الغابة، و"olive-500" هو أخضر الهوية. */
+  --color-teal-900: var(--brand-deep);
+  --color-teal-700: var(--brand-strong);
+  --color-teal-500: #3f9a62;
+  --color-teal-100: var(--brand-tint);
+  --color-teal-50: #f0f9f3;
+
+  /* ---- Surfaces ---- */
+  /* خلفية الشاشات: أفتح من اللي قبلها (#f3f4f4) بميلة خضرا خفيفة جدًا.
+     سايبين الاسم "sand-50" عشان مانغيّر كل حتة بتستخدمه. */
+  --color-sand-50: #f8faf8;
+  --color-sand-100: #eef3ee;    /* skeleton / خلفية صور المنتجات */
+  --color-sand-200: #dbe5de;    /* حدود وفواصل */
+
+  --color-gray-100: var(--brand-tint);        /* كروت الأقسام + خلفية الحقول */
+  --color-gray-200: var(--brand-tint-strong);
+
+  /* ---- Ink (كانت باهتة — اتغمّقت عشان النص والعناوين يبقوا واضحين) ---- */
+  --color-ink-900: #10261c;
+  --color-ink-600: #3d5247;
+  --color-ink-400: #5f7468;
+
+  /* ---- Accent: مانجو (تمييز بس — مش للأزرار) ---- */
+  --color-mango-500: #f9a11b;
+  --color-mango-600: #b45309;   /* نص تنبيه على فاتح */
+  --color-mango-700: #8a4a05;
+  --color-mango-100: #fff1dc;
+  --color-mango-50: #fff7e8;
+
+  /* ---- Signal ---- */
+  --color-tomato-500: #c9303c;
+  --color-tomato-100: #fde8e6;
+  --color-olive-600: var(--brand-strong);
+  --color-olive-500: var(--brand);
+  --color-olive-100: var(--brand-tint);
+
+  --color-white: #ffffff;
+
+  /* ---- Kiosk (مظلة الكشك) ----
+     الهوية البصرية: كل الشاشات بتبدأ بمظلة مقلّمة (شرايط أخضر + كريمي بحافة مقوّسة)
+     فوق "يافطة" خضرا غامقة، والمنتجات بتتحط على رفوف خشب، والأسعار على استيكرز
+     صفرا زي المحلات الحقيقية. */
+  --awning-a: var(--brand);
+  --awning-b: #fff2d1;          /* كريمي دافئ للشريط التاني */
+  --canopy-stripe: 22px;        /* عرض الشريط الواحد (كل شريط بينتهي بقوس) */
+  --canopy-bar: 15px;           /* ارتفاع الجزء المستقيم من المظلة */
+  --canopy-scallop: 11px;       /* ارتفاع القوس المشرشر (= نص عرض الشريط) */
+  --canopy-h: 26px;             /* = bar + scallop */
+  --wood-light: #dba871;
+  --wood: #b98350;
+  --wood-dark: #8f5f35;
+  --tag-yellow: #ffd84a;        /* استيكر السعر */
+
+  /* ---- Typography ----
+     'Elmahi UI' = خط "The Year of The Camel" للنص العادي (وزن Light 300) +
+     خط Alexandria بأوزان حقيقية تقيلة (600–900) لأي حاجة بولد: العناوين،
+     الأسعار، الأزرار، أسماء المنتجات. شوف theme/fonts.css. */
+  --font-display: 'Elmahi UI', 'The Year of The Camel', 'Segoe UI', Tahoma, sans-serif;
+  --font-body: 'Elmahi UI', 'The Year of The Camel', 'Segoe UI', Tahoma, sans-serif;
+
+  --fs-display-lg: 1.75rem;   /* 28px */
+  --fs-display-md: 1.375rem;  /* 22px */
+  --fs-section: 1.3125rem;    /* 21px — عناوين الأقسام */
+  --fs-title: 1.125rem;       /* 18px */
+  --fs-body: 0.9375rem;       /* 15px */
+  --fs-caption: 0.8125rem;    /* 13px */
+  --fs-price: 1.125rem;       /* 18px */
+
+  /* ---- Spacing ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* ---- Radius ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ---- Shadow ----
+     الكروت البيضا لازم تبان على الخلفية الفاتحة: حلقة رفيعة جدًا + ظل ناعم
+     بلون أخضر غامق (مش رمادي). */
+  --shadow-card: 0 0 0 1px rgba(16, 38, 28, 0.05), 0 3px 12px rgba(16, 38, 28, 0.08);
+  --shadow-float: 0 10px 28px rgba(15, 77, 50, 0.28);
+
+  /* ---- Layout ---- */
+  --app-max-width: 480px;
+  --bottom-nav-height: 64px;
+}

@@ -1,0 +1,88 @@
+.splash {
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  /* الشعار اللي بيلف (.splash__logo--ring) صندوق مربع — وهو بيلف، زواياه
+     بتطلع برّه عرض الشاشة (قطر المربع أكبر من ضلعه بحوالي 41%) فبتعمل
+     scroll أفقي والصفحة تتحرك بالجمب. القص هنا بيمنع ده، والرسمة نفسها
+     (الحلقات والكتابة) جوه الدايرة المحاطة بالمربع فمبتتقصش. */
+  overflow: hidden;
+  overflow: clip;
+  background: var(--color-teal-900);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  animation: splash-fade 0.4s ease;
+}
+
+/* دي بقت بس حاوية حجم/أنيميشن — مفيهاش أي خلفية أو ظل أو حواف مدوّرة
+   تتشاف (الخلفية البيضا اتشالت خالص من الشعار نفسه، شوف logo-transparent.png
+   بدل logo.jpg الأصلية، فالختم بيطفو على خلفية السبلاش الغامقة مباشرة
+   من غير أي كارت حواليه). هي اللي بتدخل بحركة "pop" مرنة (تكبر من صغير
+   مع لفة بسيطة وارتداد) وبعدها بتفضل تنبض بهدوء طول ما شاشة السبلاش
+   ظاهرة.
+   الحجم اتكبّر تاني 20% (360 → 430px تقريبًا، بحد أقصى 90% من عرض
+   الشاشة عشان يفضل متظبط حتى على أصغر الموبايلات). */
+.splash__logo-card {
+  width: min(430px, 90vw);
+  height: min(430px, 90vw);
+  animation:
+    splash-logo-pop 1.3s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    splash-logo-pulse 2s ease-in-out 1.3s infinite;
+}
+
+/* حاوية الطبقتين (اللي بتلف + الثابتة فوقها) — لازم position:relative
+   عشان الطبقتين (position:absolute جواها) يتحددوا بيها بالظبط. */
+.splash__logo-spinner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* نفس صورة الشعار، متكررة مرتين فوق بعض بالظبط بنفس المقاس (object-fit
+   contain) — الفرق بينهم بس في الأنيميشن والقص تحت. */
+.splash__logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* الطبقة التحتية — الصورة كاملة، وهي اللي بتلف لفة كاملة مستمرة وهادية
+   طول ما شاشة السبلاش ظاهرة (من غير delay عشان تبان بتلف من أول لحظة). */
+.splash__logo--ring {
+  animation: splash-logo-spin 2.5s linear infinite;
+}
+
+/* الطبقة الفوقانية — ثابتة (من غير أي أنيميشن)، ومقصوصة بدائرة صغيرة
+   في المنتصف بس (26% من نص مقاس الكارت) تغطي بالظبط منطقة "الماحي"
+   والورق الأخضر في الطبقة اللي تحتها وهي بتلف، فيبان إن النص ثابت من
+   غير ما يلف والباقي حواليه (الحلقات والكتابة) هو اللي بيلف. */
+.splash__logo--center {
+  clip-path: circle(26% at center);
+}
+
+@keyframes splash-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes splash-logo-pop {
+  0% { opacity: 0; transform: scale(0.35) rotate(-14deg); }
+  60% { opacity: 1; transform: scale(1.08) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes splash-logo-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes splash-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

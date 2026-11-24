@@ -1,0 +1,598 @@
+--- a/src/components/WelcomePopup.jsx
++++ b/src/components/WelcomePopup.jsx
+@@ -1,6 +1,8 @@
+-import { useState, useEffect, useRef } from 'react'
++import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
++import { X } from 'lucide-react'
+ import * as api from '../api/client'
+ import AppIcon from './AppIcon'
++import { cumulativeOffsets, stageWidth, resolveSwipe } from '../utils/popupCarousel'
+ import './WelcomePopup.css'
+ 
+ const SESSION_KEY = 'elmahi_welcome_popup_shown'
+@@ -9,36 +11,54 @@
+ // في CSS لكل مقاس (شوف .welcome-popup-card__icon-chip في الـ CSS)
+ const POPUP_ICON_SIZE = { small: 22, medium: 28, large: 36 }
+ 
+-// أد إيه لازم يسحب لليسار (بالبكسل) عشان نعتبرها سحبة قصده يكمّل بيها،
+-// مش لمسة عرضية
+-const SWIPE_DISMISS_THRESHOLD = 80
+-// السحبة النهائية لما يعدّي الحد، عشان الكارت يطير برا الشاشة قبل ما
+-// نتنقل للبوب أب اللي بعده (أو نقفل لو ده آخر واحد)
+-const SWIPE_FLY_OUT_DISTANCE = 480
++// أد إيه لازم يسحب عشان نعتبرها سحبة قصده يكمّل بيها، مش لمسة عرضية
++const SWIPE_THRESHOLD = 80
++// أقل حركة تعتبر "سحب فعلي" (بنستخدمها لمنع الـ click اللي بيحصل بعد
++// السحب مباشرة من إنه "يقفز" لكارت تاني بالغلط لمجرد إن الماوس اتحرك شوية)
++const DRAG_CLICK_GUARD = 6
+ 
+ /**
+- * بيعرض كل البوب أبات النشطة (زي ما اتحطوا في لوحة التحكم) واحد ورا
+- * التاني، مرة واحدة كل ما التطبيق يتفتح (لحد ما التاب/الجلسة تتقفل).
+- * api.fetchWelcomePopup() بترجّع مصفوفة (حتى لو بوب أب واحد بس نشط)،
+- * فالكومبوننت ده شغال دايمًا على طابور (queue)، مش عنصر واحد.
++ * بيعرض كل البوب أبات النشطة (زي ما اتحطوا في لوحة التحكم) كشريط أفقي —
++ * زي شرايط الإعلانات (سلايدر): الكارت الحالي ظاهر كامل، وجزء من اللي
++ * بعده ظاهر على جنبه، وتقدر تسحب بينهم زي أي سلايدر. api.fetchWelcomePopup()
++ * بترجّع مصفوفة (حتى لو بوب أب واحد بس نشط)، فالكومبوننت ده شغال دايمًا
++ * على طابور، مش عنصر واحد.
+  *
+- * الانتقال بين البوب أبات بقى بالسحب لليسار (بدل زرار الإغلاق ×
+- * اللي اتشال) — نفس السحبة في آخر بوب أب في الطابور بتقفله عادي، لأن
+- * dismissCurrent() أصلاً بتتصرف صح في الحالتين. زرار "تمام" ولمسة
+- * الخلفية لسه شغالين كطريقة بديلة للإغلاق.
++ * ------------------------------------------------------------------------
++ * ليه الشريط (.welcome-popup-track) بياخد direction: ltr صراحةً مع إن
++ * التطبيق كله RTL (شوف theme/global.css):
++ *
++ * الرياضة بتاعة السحب/الإزاحة (transform: translateX) دايمًا بمساحة
++ * بكسل فيزيائية (سالب = يمين، موجب = شمال) — مبتفهمش RTL. لو سبنا الشريط
++ * يورث RTL من الصفحة، الـ flexbox هيقلب ترتيب الكروت بصريًا (الكارت
++ * الأول يظهر يمين، اللي بعده شماله) بس رياضة الـ transform هتفضل زي ما
++ * هي، فالنتيجة هتبقى معكوسة ومربكة. تثبيت الشريط على ltr بيخلي "كارت 0
++ * على الشمال، كارت 1 على يمينه، وهكذا" ثابت ومتوقع دايمًا، وده بالظبط
++ * اللي بيخلي "اسحب لليسار = قدّام" (نفس اتجاه السحب القديم في النسخة
++ * قبل التعديل ده) يفتح الكارت اللي بعده من على اليمين — بالظبط زي
++ * سلايدر عادي بيتحرك مع صباعك.
++ *
++ * النص جوه كل كارت (`.welcome-popup-card`) بيرجّع direction: rtl تاني
++ * عشان العربي يتكتب صح — بس ترتيب/موضع الكروت نفسها فاضل بمنطق الـ ltr
++ * بتاع الشريط.
++ * ------------------------------------------------------------------------
+  */
+ export default function WelcomePopup() {
+   const [queue, setQueue] = useState([])
++  const [activeIndex, setActiveIndex] = useState(0)
+   const [visible, setVisible] = useState(false)
++  const [closed, setClosed] = useState(false)
+   const [dragX, setDragX] = useState(0)
+   const [isDragging, setIsDragging] = useState(false)
+-  const [isLeaving, setIsLeaving] = useState(false)
++
++  const backdropRef = useRef(null)
++  const cardRefs = useRef(new Map()) // index -> DOM node
++  const [cardSizes, setCardSizes] = useState({}) // index -> { width, height }
++  const geometryRef = useRef({ gap: 14, peek: 26 }) // احتياطي؛ بيتقرا من الـ CSS تحت
++
+   const touchStartRef = useRef(null)
+-  // مرآة لـ dragX نقدر نقراها فورًا جوه endDrag() من غير ما نستنى
+-  // إعادة الرسم — مهم خصوصًا لمسار الماوس (شوف handleMouseDown) عشان
+-  // بنحسب فيه هل السحبة عدّت حد الإلغاء ولا لأ في نفس اللحظة اللي
+-  // المستخدم بيسيب الزرار
+-  const dragXRef = useRef(0)
++  const dragXRef = useRef(0) // مرآة لـ dragX نقدر نقراها فورًا جوه endDrag()
++  const draggedRef = useRef(false) // آخر إفلات كان فيه حركة سحب فعلية؟ (يمنع click بعد السحب)
+ 
+   // تحميل الطابور مرة واحدة بس، لو لسه معرضش في السيشن ده
+   useEffect(() => {
+@@ -57,91 +77,130 @@
+     }
+   }, [])
+ 
+-  // كل ما الطابور يتغيّر ولسه فيه بوب أب في الأول، ظهّره بحركة بعد شوية
++  // أول ما الطابور يوصل، ظهّره بحركة بعد شوية
+   useEffect(() => {
+     if (queue.length === 0) return
+     const timer = setTimeout(() => setVisible(true), 400)
+     return () => clearTimeout(timer)
+   }, [queue])
+ 
+-  function dismissCurrent() {
++  // ------------------------------------------------------------ القياس
++
++  const setCardRef = useCallback(
++    (index) => (node) => {
++      if (node) cardRefs.current.set(index, node)
++      else cardRefs.current.delete(index)
++    },
++    [],
++  )
++
++  const measureAll = useCallback(() => {
++    if (backdropRef.current) {
++      const style = getComputedStyle(backdropRef.current)
++      const gap = parseFloat(style.getPropertyValue('--popup-gap'))
++      const peek = parseFloat(style.getPropertyValue('--popup-peek'))
++      geometryRef.current = {
++        gap: Number.isFinite(gap) ? gap : geometryRef.current.gap,
++        peek: Number.isFinite(peek) ? peek : geometryRef.current.peek,
++      }
++    }
++    const next = {}
++    cardRefs.current.forEach((node, index) => {
++      next[index] = { width: node.offsetWidth, height: node.offsetHeight }
++    })
++    setCardSizes(next)
++  }, [])
++
++  // بنقيس فورًا بعد أي تغيير في الطابور (قبل ما المتصفح يرسم — بيمنع أي
++  // "فلاش" لمقاس غلط لحظة قبل أول قياس)
++  useLayoutEffect(() => {
++    measureAll()
++  }, [queue, measureAll])
++
++  // وبعد كده أي تغيير في حجم الشاشة (تدوير الموبايل، تصغير نافذة
++  // المتصفح…) — عشان مقاس large (min(400px, 92vw)) بيعتمد على عرض
++  // الشاشة الفعلي
++  useEffect(() => {
++    if (queue.length === 0) return
++    if (typeof ResizeObserver === 'undefined') {
++      window.addEventListener('resize', measureAll)
++      return () => window.removeEventListener('resize', measureAll)
++    }
++    const ro = new ResizeObserver(measureAll)
++    cardRefs.current.forEach((node) => ro.observe(node))
++    return () => ro.disconnect()
++  }, [queue, measureAll])
++
++  // ------------------------------------------------------------ التنقل/الإغلاق
++
++  function closeAll() {
+     setVisible(false)
+-    // ده آخر واحد في الطابور؟ سجّل في السيشن عشان الطابور كله ميتعرضش
+-    // تاني في نفس الجلسة، حتى لو المستخدم رجع لصفحة فيها الكومبوننت ده
+-    if (queue.length <= 1) {
+-      sessionStorage.setItem(SESSION_KEY, '1')
+-    }
+-    // إعادة ضبط إزاحة السحب وحالة "بيطير برا الشاشة" بتحصل هنا (مع نقلة
+-    // الطابور نفسها) مش فورًا فوق — لو رجّعناهم صفر فورًا وقت السحب،
+-    // الكارت (لسه ماتشالش من الشاشة) كان بيرتد لحظيًا من مكانه اللي طار
+-    // له لموضعه شبه الأصلي قبل ما يتشال فعليًا، يعني "يرتد" مرة تانية
+-    // بشكل مش مقصود قبل ما يختفي.
+-    setTimeout(() => {
++    sessionStorage.setItem(SESSION_KEY, '1')
++    // بنستنى حركة الاختفاء (fade-out) تخلص قبل ما نشيل الكومبوننت خالص
++    setTimeout(() => setClosed(true), 250)
++  }
++
++  function goTo(index) {
++    setActiveIndex(index)
++    setDragX(0)
++    dragXRef.current = 0
++  }
++
++  function handleSwipeResult(result) {
++    if (result === 'next') goTo(activeIndex + 1)
++    else if (result === 'prev') goTo(activeIndex - 1)
++    else if (result === 'close') closeAll()
++    else {
+       setDragX(0)
+       dragXRef.current = 0
+-      setIsLeaving(false)
+-      setQueue((q) => q.slice(1))
+-    }, 250)
++    }
+   }
+ 
++  // ------------------------------------------------------------ السحب
++
+   function updateDragX(x) {
+     dragXRef.current = x
+     setDragX(x)
+   }
+ 
+   function startDrag(x, y) {
+-    if (isLeaving) return
+     touchStartRef.current = { x, y }
+     setIsDragging(true)
+   }
+ 
+   function moveDrag(x, y) {
+-    if (!touchStartRef.current || isLeaving) return
++    if (!touchStartRef.current) return
+     const dx = x - touchStartRef.current.x
+     const dy = y - touchStartRef.current.y
+-    // سحبة رأسية أكتر منها أفقية؟ متعتبرهاش سحبة بوب أب
++    // سحبة رأسية أكتر منها أفقية؟ متعتبرهاش سحبة سلايدر
+     if (Math.abs(dy) > Math.abs(dx)) return
+-    // بس السحب لليسار (dx سالب) بيحرّك الكارت؛ لليمين بيرجعه صفر
+-    updateDragX(Math.min(0, dx))
++    if (Math.abs(dx) > DRAG_CLICK_GUARD) draggedRef.current = true
++    updateDragX(dx)
+   }
+ 
+   function endDrag() {
+     if (!touchStartRef.current) return
+     touchStartRef.current = null
+     setIsDragging(false)
+-
+-    if (dragXRef.current <= -SWIPE_DISMISS_THRESHOLD) {
+-      // عدّى الحد — يطير الكارت برا الشاشة، وبعد ما يخلص ننتقل فعليًا
+-      // للبوب أب اللي بعده (أو نقفل لو ده آخر واحد)
+-      setIsLeaving(true)
+-      updateDragX(-SWIPE_FLY_OUT_DISTANCE)
+-      setTimeout(dismissCurrent, 220)
+-    } else {
+-      // ما وصلش للحد — يرجع مكانه (سناب باك بفضل الـ transition)
+-      updateDragX(0)
+-    }
++    handleSwipeResult(resolveSwipe(dragXRef.current, SWIPE_THRESHOLD, activeIndex, queue.length))
+   }
+ 
+   function handleTouchStart(e) {
+     const t = e.touches[0]
+     startDrag(t.clientX, t.clientY)
+   }
+-
+   function handleTouchMove(e) {
+     const t = e.touches[0]
+     moveDrag(t.clientX, t.clientY)
+   }
+-
+   function handleTouchEnd() {
+     endDrag()
+   }
+ 
+-  // نفس السحب بالظبط بس بالماوس، عشان يشتغل وقت تجربة التطبيق من
+-  // متصفح الديسك توب (الموبايل الحقيقي بيستخدم أحداث اللمس فوق). بنسمع
+-  // الحركة والإفلات على النافذة كلها مش بس على الكارت، عشان السحب يفضل
+-  // شغال حتى لو المؤشر خرج برا حدود الكارت أثناء السحب.
++  // نفس السحب بالظبط بس بالماوس، عشان يشتغل وقت تجربة التطبيق من متصفح
++  // الديسك توب. بنسمع الحركة والإفلات على النافذة كلها مش بس على
++  // الستايدج، عشان السحب يفضل شغال حتى لو المؤشر خرج برا حدوده.
+   function handleMouseDown(e) {
+-    if (isLeaving) return
+     startDrag(e.clientX, e.clientY)
+     const handleMove = (ev) => moveDrag(ev.clientX, ev.clientY)
+     const handleUp = () => {
+@@ -153,73 +212,120 @@
+     window.addEventListener('mouseup', handleUp)
+   }
+ 
+-  const popup = queue[0]
+-  if (!popup) return null
++  // لمسة على الكارت اللي ظاهر جزء منه بس (مش النشط) بتنقلك له فورًا —
++  // زي أي سلايدر بتلمس فيه الصورة الجاية فتتنقل لها
++  function handleCardClick(index) {
++    if (draggedRef.current) {
++      // ده click جه بعد سحب فعلي (مش نقرة حقيقية) — نتجاهله مرة واحدة بس
++      draggedRef.current = false
++      return
++    }
++    if (index !== activeIndex) goTo(index)
++  }
++
++  if (closed || queue.length === 0) return null
+ 
+-  // 3 أحجام ثابتة بيتحددوا من لوحة التحكم (small/medium/large) — لو
+-  // القيمة مش موجودة أو غريبة (بيانات قديمة قبل الميزة دي، أو mock data)
+-  // بنرجع لـ medium افتراضيًا وهو نفس الحجم القديم قبل الميزة دي.
+-  const sizeClass = ['small', 'medium', 'large'].includes(popup.size) ? popup.size : 'medium'
+-
+-  // بنحسب الـ transform يدويًا هنا (بدل ما نسيبه للكلاس بس) عشان نضيف
+-  // إزاحة السحب (dragX) فوق حالة الظهور العادية من غير ما يتعارضوا مع
+-  // بعض. وقت السحب نفسه الترانزيشن بيتقفل عشان الكارت يتبع الصباع
+-  // لحظيًا، وبعد ما يسيبه (سناب باك أو طيران) بيرجع الترانزيشن العادي.
+-  const baseTransform = visible ? 'translateY(0) scale(1)' : 'translateY(24px) scale(0.96)'
+-  const cardStyle = {
+-    transform: `${baseTransform} translateX(${dragX}px)`,
+-    transition: isDragging
+-      ? 'transform 0s linear'
+-      : 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+-    // مؤشر السحب (يد) في متصفح الديسك توب بس — على الموبايل مالوش تأثير.
+-    // user-select: none أثناء السحب عشان الماوس ميحدّدش نص الكارت وهو بيتحرك.
+-    cursor: isDragging ? 'grabbing' : 'grab',
+-    userSelect: isDragging ? 'none' : 'auto',
++  const { gap, peek } = geometryRef.current
++  const offsets = cumulativeOffsets(
++    queue.map((_, i) => cardSizes[i]?.width),
++    gap,
++  )
++  const baseOffset = -(offsets[activeIndex] ?? 0)
++  const trackX = (baseOffset === 0 ? 0 : baseOffset) + dragX
++
++  const activeSize = cardSizes[activeIndex]
++  const hasNext = activeIndex < queue.length - 1
++  const stageStyle = {
++    width: stageWidth(activeSize?.width, hasNext, peek) || undefined,
++    height: activeSize?.height || undefined,
+   }
+ 
+   return (
+     <div
++      ref={backdropRef}
+       className={`welcome-popup-backdrop${visible ? ' welcome-popup-backdrop--visible' : ''}`}
+-      onClick={dismissCurrent}
++      onClick={closeAll}
+       role="presentation"
+     >
+       <div
+-        className={`welcome-popup-card welcome-popup-card--${sizeClass}${visible ? ' welcome-popup-card--visible' : ''}`}
+-        style={cardStyle}
+-        role="dialog"
+-        aria-modal="true"
+-        aria-labelledby={popup.image ? undefined : 'welcome-popup-title'}
+-        aria-label={popup.image ? popup.title || undefined : undefined}
++        className="welcome-popup-stage"
++        style={stageStyle}
+         onClick={(e) => e.stopPropagation()}
+         onTouchStart={handleTouchStart}
+         onTouchMove={handleTouchMove}
+         onTouchEnd={handleTouchEnd}
+         onMouseDown={handleMouseDown}
+       >
+-        {popup.image && (
+-          <div className="welcome-popup-card__image-wrap">
+-            <img
+-              src={popup.image}
+-              alt={popup.title || ''}
+-              className="welcome-popup-card__image"
+-              draggable={false}
+-              onDragStart={(e) => e.preventDefault()}
+-            />
+-          </div>
+-        )}
+-        <div className="welcome-popup-card__body">
+-          {!popup.image && (
+-            <>
+-              <span className="welcome-popup-card__icon-chip">
+-                <AppIcon name={popup.icon} size={POPUP_ICON_SIZE[sizeClass]} color="var(--color-ink-900)" strokeWidth={1.6} />
+-              </span>
+-              <h2 id="welcome-popup-title" className="welcome-popup-card__title">{popup.title}</h2>
+-              <p className="welcome-popup-card__subtitle">{popup.subtitle}</p>
+-            </>
+-          )}
+-          <button type="button" className="btn btn--primary btn--block" onClick={dismissCurrent}>
+-            {popup.ctaLabel || 'تمام'}
+-          </button>
++        {/* زرار إغلاق واحد ثابت فوق الستايدج (مش جوه كل كارت) — بيفضل
++            مكانه ثابت وانت بتسحب بين الكروت، ومابيتحركش مع الـ track */}
++        <button type="button" className="welcome-popup-close" onClick={closeAll} aria-label="إغلاق">
++          <X size={18} strokeWidth={2} />
++        </button>
++
++        <div
++          className="welcome-popup-track"
++          style={{
++            transform: `translateX(${trackX}px)`,
++            transition: isDragging ? 'transform 0s linear' : 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
++            cursor: isDragging ? 'grabbing' : 'grab',
++            userSelect: isDragging ? 'none' : 'auto',
++          }}
++        >
++          {queue.map((popup, index) => {
++            const sizeClass = ['small', 'medium', 'large'].includes(popup.size) ? popup.size : 'medium'
++            const isActive = index === activeIndex
++            return (
++              <div
++                key={popup.id ?? index}
++                ref={setCardRef(index)}
++                data-popup-id={popup.id ?? index}
++                data-index={index}
++                className={`welcome-popup-card welcome-popup-card--${sizeClass}${isActive ? ' welcome-popup-card--active' : ''}${visible ? ' welcome-popup-card--visible' : ''}`}
++                role={isActive ? 'dialog' : undefined}
++                aria-hidden={isActive ? undefined : true}
++                aria-modal={isActive ? 'true' : undefined}
++                aria-labelledby={isActive && !popup.image ? 'welcome-popup-title' : undefined}
++                aria-label={isActive && popup.image ? popup.title || undefined : undefined}
++                onClick={() => handleCardClick(index)}
++              >
++                {popup.image && (
++                  <div className="welcome-popup-card__image-wrap">
++                    <img
++                      src={popup.image}
++                      alt={popup.title || ''}
++                      className="welcome-popup-card__image"
++                      draggable={false}
++                      onDragStart={(e) => e.preventDefault()}
++                    />
++                  </div>
++                )}
++                <div className="welcome-popup-card__body">
++                  {!popup.image && (
++                    <>
++                      <span className="welcome-popup-card__icon-chip">
++                        <AppIcon name={popup.icon} size={POPUP_ICON_SIZE[sizeClass]} color="var(--color-ink-900)" strokeWidth={1.6} />
++                      </span>
++                      <h2 id={isActive ? 'welcome-popup-title' : undefined} className="welcome-popup-card__title">
++                        {popup.title}
++                      </h2>
++                      <p className="welcome-popup-card__subtitle">{popup.subtitle}</p>
++                    </>
++                  )}
++                  <button
++                    type="button"
++                    className="btn btn--primary btn--block"
++                    tabIndex={isActive ? 0 : -1}
++                    onClick={(e) => {
++                      e.stopPropagation()
++                      handleSwipeResult(activeIndex < queue.length - 1 ? 'next' : 'close')
++                    }}
++                  >
++                    {popup.ctaLabel || 'تمام'}
++                  </button>
++                </div>
++              </div>
++            )
++          })}
+         </div>
+       </div>
+     </div>
+--- a/src/components/WelcomePopup.css
++++ b/src/components/WelcomePopup.css
+@@ -1,4 +1,27 @@
++/* =============================================================================
++   بوب أب الترحيب — شريط سلايدرات (كاروسيل) بيعرض كل البوب أبات النشطة،
++   جزء من الكارت اللي بعده ظاهر على جنب الكارت الحالي، وتقدر تسحب بينهم.
++   البنية:
++     .welcome-popup-backdrop  خلفية غامقة، تغطي الشاشة، بتوسّط الستايدج
++       .welcome-popup-close   زرار الإغلاق (×) — ثابت المكان، مش جوه الشريط
++       .welcome-popup-stage   "شباك" العرض: عرضه/ارتفاعه بيتظبطوا من الكومبوننت
++                               (بيتحسبوا من مقاس الكارت النشط الفعلي)، overflow:hidden
++         .welcome-popup-track  الشريط نفسه (كل الكروت جنب بعض)، بيتحرّك بـ
++                                transform تبعًا للكارت النشط + سحب المستخدم
++           .welcome-popup-card × N
++   ========================================================================= */
++
++/* المسافة بين كارت وكارت (--popup-gap)، وعرض "شباك" الستايدج الزيادة عن
++   عرض الكارت النشط (--popup-peek) — قيم بتتقرا من الكومبوننت
++   (getComputedStyle) عشان رياضة الـ transform في JS تفضل متطابقة مع القيم
++   هنا دايمًا (مصدر واحد للحقيقة).
++   ملحوظة: peek مش هو نفسه مقدار الجزء اللي فعليًا هيبان من الكارت اللي بعده
++   — المسافة (gap) بتاخد جزء منه الأول. الجزء الظاهر فعليًا = peek - gap،
++   فلو عايز يبان مثلاً ٢٦px من الكارت اللي بعده، peek لازم يبقى ٢٦+gap. */
+ .welcome-popup-backdrop {
++  --popup-gap: 14px;
++  --popup-peek: 40px; /* = ٢٦px ظاهرين فعليًا من الكارت اللي بعده + ١٤px gap */
++
+   position: fixed;
+   inset: 0;
+   background: rgba(28, 43, 42, 0);
+@@ -14,33 +37,90 @@
+   background: rgba(28, 43, 42, 0.55);
+ }
+ 
++.welcome-popup-close {
++  position: absolute;
++  /* فوق الستايدج مش جواه، عشان يفضل ثابت مكانه مهما اتحرك الشريط تحته */
++  top: calc(-1 * var(--sp-2));
++  left: calc(-1 * var(--sp-2));
++  width: 34px;
++  height: 34px;
++  border: none;
++  border-radius: var(--radius-pill);
++  background: var(--color-white);
++  color: var(--color-ink-900);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  padding: 0;
++  box-shadow: var(--shadow-float);
++  z-index: 3;
++  cursor: pointer;
++}
++
++.welcome-popup-stage {
++  position: relative;
++  overflow: hidden;
++  border-radius: var(--radius-lg);
++  transition:
++    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
++    height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
++}
++
++.welcome-popup-track {
++  display: flex;
++  align-items: flex-start;
++  gap: var(--popup-gap);
++  /* شوف التعليق الطويل في WelcomePopup.jsx: الشريط بياخد ltr صراحةً عشان
++     رياضة السحب/الإزاحة تفضل بسيطة ومتوقعة رغم إن الصفحة كلها RTL */
++  direction: ltr;
++}
++
+ .welcome-popup-card {
++  flex: none;
+   background: var(--color-white);
+   border-radius: var(--radius-lg);
+-  max-width: 320px;
+-  width: 100%;
+   text-align: center;
+   position: relative;
+   overflow: hidden;
+   box-shadow: var(--shadow-float);
++  direction: rtl; /* النص جوه الكارت لازم يتكتب صح حتى لو الشريط نفسه ltr */
+   opacity: 0;
+-  /* transform + transition اتنقلوا لـ inline style في الكومبوننت نفسه
+-     عشان يتحسبوا مع إزاحة سحب البوب أب (dragX) مع بعض من غير تعارض */
++  /* المحور اللي بيصغّر/يكبّر حواليه لازم يبقى الحافة الشمال (بداية الكارت في
++     شريط الـ ltr) مش النص — عشان الكارت اللي "بيك" (مش نشط ومصغّر شوية) يفضل
++     طرفه الشمال (اللي بيبان منه جزء من جوه الستايدج) في نفس مكانه بالظبط
++     مهما كان مقياس التصغير، وميتزحزحش لجوه ويقلل مساحة الـ peek الفعلية */
++  transform-origin: left center;
++  transform: scale(0.94) translateY(24px);
++  transition:
++    opacity 0.3s ease,
++    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
++}
++
++/* الكارت النشط: ظاهر كامل. أي كارت تاني ظاهر منه جزء (بيك) بيبان مصغّر
++   وباهت شوية — بيوضّح إنه مش الكارت الحالي، زي أي سلايدر */
++.welcome-popup-card--visible.welcome-popup-card--active {
++  opacity: 1;
++  transform: scale(1) translateY(0);
++}
++
++.welcome-popup-card--visible:not(.welcome-popup-card--active) {
++  opacity: 0.55;
++  transform: scale(0.94) translateY(0);
+ }
+ 
+-/* 3 أحجام ثابتة بيتحددوا من لوحة التحكم — medium هو نفس الحجم القديم
+-   قبل الميزة دي (max-width: 320px)، فمفيش أي تغيير شكل للبوب أبات
+-   الموجودة فعلاً غير لو حد غيّر الحجم بنفسه من اللوحة. */
++/* 3 أحجام ثابتة بيتحددوا من لوحة التحكم. الحد الأقصى بيسيب مساحة لهامش
++   الخلفية (--sp-6 كل جنب) ولبيك الكارت اللي بعده، عشان الشريط كله
++   (الكارت + البيك) يفضل جوه الشاشة من غير ما يقصّ. */
+ .welcome-popup-card--small {
+-  max-width: 260px;
++  width: min(260px, calc(100vw - (var(--sp-6) * 2) - var(--popup-peek)));
+ }
+ 
+ .welcome-popup-card--medium {
+-  max-width: 320px;
++  width: min(320px, calc(100vw - (var(--sp-6) * 2) - var(--popup-peek)));
+ }
+ 
+ .welcome-popup-card--large {
+-  max-width: min(440px, 92vw);
++  width: min(400px, calc(100vw - (var(--sp-6) * 2) - var(--popup-peek)));
+ }
+ 
+ .welcome-popup-card--small .welcome-popup-card__body {
+@@ -51,14 +131,6 @@
+   padding: var(--sp-7, 28px) var(--sp-6) var(--sp-6);
+ }
+ 
+-.welcome-popup-card--small .welcome-popup-card__image-wrap {
+-  aspect-ratio: 4 / 3;
+-}
+-
+-.welcome-popup-card--large .welcome-popup-card__image-wrap {
+-  aspect-ratio: 5 / 4;
+-}
+-
+ .welcome-popup-card--small .welcome-popup-card__icon-chip {
+   width: 44px;
+   height: 44px;
+@@ -81,6 +153,10 @@
+   padding: var(--sp-6) var(--sp-5) var(--sp-5);
+ }
+ 
++/* نسبة عرض-لارتفاع واحدة ثابتة لكل الأحجام (كانت مختلفة لكل حجم قبل
++   كده: 4/3 للصغير، 1/1 للمتوسط، 5/4 للكبير — تغيير الحجم كان بيغيّر
++   قصّ الصورة نفسه، مش بس مقاسها). دلوقتي الصورة بتكبر/تصغر بنفس نسبتها
++   الأصلية مع الكارت بالظبط، مهما كان الحجم المختار. */
+ .welcome-popup-card__image-wrap {
+   width: 100%;
+   aspect-ratio: 1 / 1;
+@@ -94,10 +170,6 @@
+   display: block;
+ }
+ 
+-.welcome-popup-card--visible {
+-  opacity: 1;
+-}
+-
+ .welcome-popup-card__icon-chip {
+   display: flex;
+   align-items: center;

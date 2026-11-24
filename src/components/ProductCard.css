@@ -1,0 +1,154 @@
+.product-card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  background: var(--color-sand-100);
+}
+
+.product-card__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-teal-500);
+  opacity: 0.5;
+}
+
+.product-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.product-card__badge {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+}
+
+.product-card__badge--secondary {
+  top: auto;
+  bottom: var(--sp-2);
+  right: var(--sp-2);
+}
+
+.product-card__body {
+  padding: var(--sp-2) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.product-card__name {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  line-height: 1.4;
+  min-height: 2.8em; /* سطرين دايمًا — الكارت مبيتغيرش لو الاسم سطر واحد */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card__unit-line {
+  line-height: 1.3;
+  font-weight: 600;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* صف الوحدات بارتفاع ثابت: لو المنتج ليه أكتر من وحدة بتتحط في سطر واحد
+   وبتتسحب أفقيًا، بدل ما تنزل سطر جديد وتكبّر الكارت. */
+.product-card__units {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.product-card__units::-webkit-scrollbar {
+  display: none;
+}
+
+.product-card__units .chip {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.product-card__deal-hint {
+  color: var(--color-mango-600);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.product-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.product-card__points {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-mango-600);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chip--sm {
+  padding: 3px 12px;
+  font-size: var(--fs-caption);
+  border-width: 1px;
+}
+
+.product-card__footer {
+  margin-top: auto; /* الفوتر ملزوق تحت دايمًا — مكان الاستيكر ثابت */
+  padding-top: var(--sp-1);
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.product-card__add {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--brand);
+  color: var(--color-white);
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(19, 135, 63, 0.35);
+}
+
+.product-card__add:active {
+  background: var(--brand-strong);
+}

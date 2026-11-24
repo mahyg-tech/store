@@ -1,0 +1,232 @@
+/* =============================================================================
+   بوب أب الترحيب — شريط سلايدرات (كاروسيل) بيعرض كل البوب أبات النشطة،
+   جزء من الكارت اللي بعده ظاهر على جنب الكارت الحالي، وتقدر تسحب بينهم.
+   البنية:
+     .welcome-popup-backdrop  خلفية غامقة، تغطي الشاشة، بتوسّط الإطار
+       .welcome-popup-frame   إطار من غير overflow — بيشيل الزرار والستايدج
+         .welcome-popup-close زرار الإغلاق (×) — ثابت المكان، برّه الستايدج
+         .welcome-popup-stage "شباك" العرض: عرضه/ارتفاعه بيتظبطوا من الكومبوننت
+                               (بيتحسبوا من مقاس الكارت النشط الفعلي)، overflow:hidden
+         .welcome-popup-track  الشريط نفسه (كل الكروت جنب بعض)، بيتحرّك بـ
+                                transform تبعًا للكارت النشط + سحب المستخدم
+           .welcome-popup-card × N
+   ========================================================================= */
+
+/* المسافة بين كارت وكارت (--popup-gap)، وعرض "شباك" الستايدج الزيادة عن
+   عرض الكارت النشط (--popup-peek) — قيم بتتقرا من الكومبوننت
+   (getComputedStyle) عشان رياضة الـ transform في JS تفضل متطابقة مع القيم
+   هنا دايمًا (مصدر واحد للحقيقة).
+   ملحوظة: peek مش هو نفسه مقدار الجزء اللي فعليًا هيبان من الكارت اللي بعده
+   — المسافة (gap) بتاخد جزء منه الأول. الجزء الظاهر فعليًا = peek - gap،
+   فلو عايز يبان مثلاً ٢٦px من الكارت اللي بعده، peek لازم يبقى ٢٦+gap. */
+.welcome-popup-backdrop {
+  --popup-gap: 14px;
+  --popup-peek: 40px; /* = ٢٦px ظاهرين فعليًا من الكارت اللي بعده + ١٤px gap */
+
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 43, 42, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6);
+  z-index: 50;
+  /* كانت 0.25s — طوّلناها شوية عشان تواكب مدة تأثير "الفرقعة" (650ms) بدل
+     ما الخلفية تختفي قبل ما القطع المتطايرة تخلص */
+  transition: background 0.5s ease;
+}
+
+.welcome-popup-backdrop--visible {
+  background: rgba(28, 43, 42, 0.55);
+}
+
+/* قطع تأثير "الفرقعة" عند الإغلاق — شوف utils/shatterEffect.js. كل قطعة
+   بتبدأ من وضعها الطبيعي، تكبر شوية بسرعة (إحساس انفجار)، وبعدين تطير
+   لاتجاهها (--shatter-tx/--shatter-ty المحسوبة في JS) مع دوران وتلاشي. */
+@keyframes popup-shatter-piece {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  15% {
+    transform: translate(0, 0) rotate(0deg) scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--shatter-tx), var(--shatter-ty)) rotate(var(--shatter-rot)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* الإطار بيجمع زرار الإغلاق + الستايدج. من غير overflow عن قصد: الزرار
+   طالع شوية برّه حافة الكارت (فوق شمال)، ولو كان جوه الستايدج
+   (overflow: hidden) كان بيتقصّ ومبيظهرش كامل. الهامش اللي حوالين الإطار
+   (padding الـ backdrop = --sp-6) أكبر من بروز الزرار فبيبان كامل دايمًا. */
+.welcome-popup-frame {
+  position: relative;
+  max-width: 100%;
+}
+
+.welcome-popup-close {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--color-sand-200, #e6e0d4);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-ink-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: var(--shadow-float);
+  z-index: 5; /* فوق الستايدج وكل كروته */
+  cursor: pointer;
+}
+
+.welcome-popup-close:active {
+  transform: scale(0.94);
+}
+
+.welcome-popup-stage {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.welcome-popup-track {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--popup-gap);
+  /* شوف التعليق الطويل في WelcomePopup.jsx: الشريط بياخد ltr صراحةً عشان
+     رياضة السحب/الإزاحة تفضل بسيطة ومتوقعة رغم إن الصفحة كلها RTL */
+  direction: ltr;
+}
+
+.welcome-popup-card {
+  flex: none;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-float);
+  direction: rtl; /* النص جوه الكارت لازم يتكتب صح حتى لو الشريط نفسه ltr */
+  opacity: 0;
+  /* المحور اللي بيصغّر/يكبّر حواليه لازم يبقى الحافة الشمال (بداية الكارت في
+     شريط الـ ltr) مش النص — عشان الكارت اللي "بيك" (مش نشط ومصغّر شوية) يفضل
+     طرفه الشمال (اللي بيبان منه جزء من جوه الستايدج) في نفس مكانه بالظبط
+     مهما كان مقياس التصغير، وميتزحزحش لجوه ويقلل مساحة الـ peek الفعلية */
+  transform-origin: left center;
+  transform: scale(0.94) translateY(24px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* الكارت النشط: ظاهر كامل. أي كارت تاني ظاهر منه جزء (بيك) بيبان مصغّر
+   وباهت شوية — بيوضّح إنه مش الكارت الحالي، زي أي سلايدر */
+.welcome-popup-card--visible.welcome-popup-card--active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.welcome-popup-card--visible:not(.welcome-popup-card--active) {
+  opacity: 0.55;
+  transform: scale(0.94) translateY(0);
+}
+
+/* 3 أحجام ثابتة بيتحددوا من لوحة التحكم. الحد الأقصى بيسيب مساحة لهامش
+   الخلفية (--sp-6 كل جنب) ولبيك الكارت اللي بعده، عشان الشريط كله
+   (الكارت + البيك) يفضل جوه الشاشة من غير ما يقصّ. */
+.welcome-popup-card--small {
+  width: min(260px, calc(100vw - (var(--sp-6) * 2) - var(--popup-peek)));
+}
+
+.welcome-popup-card--medium {
+  width: min(320px, calc(100vw - (var(--sp-6) * 2) - var(--popup-peek)));
+}
+
+.welcome-popup-card--large {
+  width: min(400px, calc(100vw - (var(--sp-6) * 2) - var(--popup-peek)));
+}
+
+.welcome-popup-card--small .welcome-popup-card__body {
+  padding: var(--sp-5) var(--sp-4, 16px) var(--sp-4, 16px);
+}
+
+.welcome-popup-card--large .welcome-popup-card__body {
+  padding: var(--sp-7, 28px) var(--sp-6) var(--sp-6);
+}
+
+.welcome-popup-card--small .welcome-popup-card__icon-chip {
+  width: 44px;
+  height: 44px;
+}
+
+.welcome-popup-card--large .welcome-popup-card__icon-chip {
+  width: 68px;
+  height: 68px;
+}
+
+.welcome-popup-card--small .welcome-popup-card__title {
+  font-size: var(--fs-body-lg, 1.05rem);
+}
+
+.welcome-popup-card--large .welcome-popup-card__title {
+  font-size: var(--fs-display-lg, 1.6rem);
+}
+
+.welcome-popup-card__body {
+  padding: var(--sp-6) var(--sp-5) var(--sp-5);
+}
+
+/* نسبة عرض-لارتفاع واحدة ثابتة لكل الأحجام (كانت مختلفة لكل حجم قبل
+   كده: 4/3 للصغير، 1/1 للمتوسط، 5/4 للكبير — تغيير الحجم كان بيغيّر
+   قصّ الصورة نفسه، مش بس مقاسها). دلوقتي الصورة بتكبر/تصغر بنفس نسبتها
+   الأصلية مع الكارت بالظبط، مهما كان الحجم المختار. */
+.welcome-popup-card__image-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--color-sand-100);
+}
+
+.welcome-popup-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.welcome-popup-card__icon-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--color-mango-100);
+  margin: 0 auto var(--sp-2);
+}
+
+.welcome-popup-card__title {
+  font-size: var(--fs-display-md);
+  margin-bottom: var(--sp-2);
+}
+
+.welcome-popup-card__subtitle {
+  color: var(--color-ink-600);
+  margin-bottom: var(--sp-5);
+}
+
+/* الكارت كله قابل للسحب (cursor: grab من الكومبوننت نفسه)، لكن الزرار
+   لسه لازم يبان بمؤشر عادي (يد بتأشر) مش يد سحب */
+.welcome-popup-card__body .btn {
+  cursor: pointer;
+}

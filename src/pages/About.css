@@ -1,0 +1,54 @@
+.about-page {
+  padding-top: var(--sp-6);
+  padding-bottom: var(--sp-6);
+  text-align: center;
+}
+
+.about-page__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+}
+
+.about-page__brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-teal-100);
+  color: var(--color-teal-900);
+}
+
+.about-page__brand-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin: 0;
+}
+
+.about-page__text {
+  font-size: var(--fs-body);
+  color: var(--color-ink-600);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  text-align: right;
+  background: var(--color-white);
+  border-radius: 14px;
+  padding: var(--sp-4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin: 0 0 var(--sp-5);
+}
+
+.about-page__contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--color-teal-900);
+  text-decoration: none;
+}

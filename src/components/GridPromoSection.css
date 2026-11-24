@@ -1,0 +1,17 @@
+.grid-promo-section {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.grid-promo-section--rail-top {
+  /* كروت تحت عنوان رف منتجات (HomeRail): قريبة من العنوان ومن الرف اللي تحتها */
+  margin-top: 0;
+  margin-bottom: var(--sp-3);
+}
+
+.grid-promo-section__item {
+  width: calc(((100% - 0 * var(--sp-3)) / 3) * 0.9);
+}

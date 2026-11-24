@@ -1,0 +1,190 @@
+.promo-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-slider__track {
+  direction: ltr; /* فيزيائيًا LTR عشان حساب الإزاحة يبقى ثابت ومتوقع */
+  display: flex;
+  width: 100%; /* مرجع موحّد لكل النسب (flex-basis + translateX) — شوف التعليق في PromoSlider.jsx */
+  height: 100%;
+  /* مفيش padding هنا عن قصد: التوسيط بيتعمل بإزاحة صريحة في الـ transform.
+     المسافة بين السلايدات (gap) بتتحدد من الكومبوننت */
+  touch-action: pan-y;
+  cursor: grab;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  perspective: 1000px; /* عشان ميلان السلايدرات الجنبية (rotateY) يبان زي منحنى حقيقي مش تفلطح */
+}
+
+.promo-slider__track:active {
+  cursor: grabbing;
+}
+
+.promo-slider__slide {
+  flex-shrink: 0; /* لازم — من غيرها فليكس هيضغط كل السلايدرات عشان تتساوى مع عرض الحاوية، ويبوّظ تأثير "الطرف الباين" */
+  height: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  direction: rtl; /* النص نفسه يفضل يقرأ من اليمين للشمال جوه كل سلايد */
+  color: var(--color-white);
+  user-select: none;
+  backface-visibility: hidden; /* يمنع أي تقطيع بصري وقت الميل ثلاثي الأبعاد */
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+}
+
+.promo-slider__icon-chip {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.promo-slider__slide--image {
+  padding: 0;
+  overflow: hidden;
+}
+
+.promo-slider__slide--link {
+  cursor: pointer;
+}
+
+.promo-slider__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.promo-slider__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-title);
+}
+
+.promo-slider__subtitle {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  opacity: 1;
+  margin-top: 2px;
+}
+
+.promo-slider__dots {
+  position: absolute;
+  bottom: var(--sp-2);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.promo-slider__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.promo-slider__dot--active {
+  width: 18px;
+  background: var(--color-white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-slider__track,
+  .promo-slider__slide {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* وضع "من تحت لفوق" (promoDirection = 'up') — PromoSliderVertical.jsx    */
+/* ---------------------------------------------------------------------- */
+.promo-slider__track--vertical {
+  flex-direction: column;
+  align-items: center; /* السلايد (88% عرض) في نص الحاوية */
+  perspective: none;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.promo-slider__slide--vertical {
+  transform: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-slider__track--vertical {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* أحجام السلايدر: قصير (compact) ونص (half) — PromoSliderGroup.jsx        */
+/* ---------------------------------------------------------------------- */
+.promo-slider-row {
+  display: flex;
+  direction: ltr; /* شمال/يمين فعليين زي ما الأدمن اختار، مش مقلوبين بالـ RTL */
+  gap: var(--sp-2);
+  /* نفس عرض السلايد العادي بالظبط (88% من الحاوية، في النص) — فكل سلايدر نص
+     بيبقى نص عرضه فعلًا، وحوافه متظبطة مع السلايدرات اللي فوقه وتحته */
+  width: 88%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.promo-slider-row__cell {
+  flex: 1 1 0;
+  min-width: 0; /* عشان محتوى الشريط ما يوسّعش الخلية عن نصها */
+}
+
+.promo-slider--compact .promo-slider__slide {
+  padding: var(--sp-2) var(--sp-3);
+  gap: var(--sp-2);
+}
+
+.promo-slider--compact .promo-slider__icon-chip {
+  width: 28px;
+  height: 28px;
+}
+
+.promo-slider--compact .promo-slider__title {
+  font-size: var(--fs-body);
+}
+
+.promo-slider--compact .promo-slider__subtitle {
+  display: none;
+}
+
+.promo-slider--half .promo-slider__slide {
+  padding: var(--sp-2);
+}
+
+.promo-slider--half .promo-slider__icon-chip {
+  display: none;
+}
+
+.promo-slider--half .promo-slider__dots {
+  bottom: 4px;
+  gap: 4px;
+}
+
+.promo-slider--half .promo-slider__dot {
+  width: 5px;
+  height: 5px;
+}
+
+.promo-slider--half .promo-slider__dot--active {
+  width: 12px;
+}

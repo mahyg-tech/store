@@ -1,0 +1,221 @@
+.tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
+
+/* طبقة شفافة بتمنع أي ضغط أو سحب على الشاشة اللي تحتها أثناء الجولة */
+.tour-blocker {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+.tour-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+  pointer-events: none;
+}
+
+/* "التنوير": الظل الضخم بيغطي الشاشة كلها ما عدا العنصر */
+.tour-spot {
+  position: absolute;
+  border-radius: 18px;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.68);
+  outline: 3px solid var(--color-white);
+  pointer-events: none;
+  transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.tour-grow {
+  transform: scale(1.1);
+  transition: transform 0.35s ease;
+}
+
+.tour-card {
+  position: absolute;
+  left: 50%;
+  width: min(340px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  padding: var(--sp-5);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  animation: tour-pop 0.3s ease;
+}
+
+.tour-card--center {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes tour-pop {
+  from {
+    opacity: 0;
+    margin-top: 10px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+.tour-card__title {
+  margin: 0 0 var(--sp-2);
+  font-weight: 800;
+  color: var(--color-ink-900);
+}
+
+.tour-card__text {
+  margin: 0 0 var(--sp-4);
+  line-height: 1.8;
+}
+
+.tour-card__actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.tour-card__actions .btn {
+  flex: 1;
+}
+
+.tour-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: var(--sp-3);
+}
+
+.tour-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d9d9d9;
+}
+
+.tour-dot--on {
+  width: 20px;
+  border-radius: 4px;
+  background: var(--brand-deep, #1d6b66);
+}
+
+/* ===== صور توضيحية بسيطة ===== */
+.tour-mock {
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-3);
+  background: #f6f6f3;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  text-align: right;
+}
+
+.tour-mock__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 6px 0;
+}
+
+.tour-mock__row--total {
+  margin-top: 4px;
+  border-top: 1px dashed #d9d9d9;
+}
+
+.tour-mock__name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.tour-mock__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tour-mock__stepper i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-style: normal;
+  color: var(--color-white);
+  background: var(--brand-deep, #1d6b66);
+  border-radius: 50%;
+}
+
+.tour-mock__address {
+  padding: 8px 10px;
+  margin-bottom: var(--sp-2);
+  background: var(--color-white);
+  border-radius: 10px;
+}
+
+.tour-mock__btn {
+  padding: 10px;
+  color: var(--color-white);
+  font-weight: 700;
+  text-align: center;
+  background: var(--brand-deep, #1d6b66);
+  border-radius: 999px;
+}
+
+.tour-mock--cartbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-white);
+  background: var(--brand-deep, #1d6b66);
+  border-radius: 999px;
+}
+
+.tour-mock__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-ink-900);
+  font-weight: 700;
+  background: var(--color-white);
+  border-radius: 50%;
+}
+
+.tour-mock--success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.tour-mock__check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  color: var(--color-white);
+  font-size: 26px;
+  background: #2f8a4e;
+  border-radius: 50%;
+}
+
+.tour-voice-btn {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: 10px;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  line-height: 1;
+  background: #f1f1ee;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}

@@ -1,0 +1,133 @@
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-8);
+}
+
+.checkout-payment,
+.checkout-summary {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.checkout-payment__option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--color-sand-50);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+}
+
+.checkout-summary__total {
+  padding-top: var(--sp-2);
+  border-top: 1px dashed var(--color-sand-200);
+  font-weight: 700;
+  font-size: var(--fs-title);
+}
+
+/* ---- اختيار طريقة الدفع (كاش / محفظة) ---- */
+.checkout-payment__option {
+  cursor: pointer;
+  border: 1.5px solid transparent;
+}
+
+.checkout-payment__option--selected {
+  border-color: var(--color-teal-700);
+  background: var(--color-white);
+}
+
+.checkout-payment__option--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkout-payment__radio {
+  accent-color: var(--color-teal-700);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.checkout-payment__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- مبلغ المحفظة (بيظهر لما العميل يختار الدفع بالمحفظة) ---- */
+.checkout-wallet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--color-sand-50);
+  border-radius: var(--radius-md);
+}
+
+.checkout-wallet__label {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-ink-600);
+}
+
+.checkout-wallet__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.checkout-wallet__row input {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid var(--color-sand-200);
+  border-radius: var(--radius-md);
+  padding: 11px var(--sp-3);
+  background: var(--color-white);
+  color: var(--color-ink-900);
+}
+
+.checkout-wallet__row input:focus {
+  border-color: var(--color-teal-700);
+  outline: none;
+}
+
+.checkout-wallet__row input[aria-invalid='true'] {
+  border-color: var(--color-tomato-500);
+}
+
+.checkout-wallet__unit {
+  color: var(--color-ink-600);
+  font-weight: 600;
+}
+
+.checkout-wallet__hint {
+  color: var(--color-ink-600);
+}
+
+.checkout-wallet__error {
+  color: var(--color-tomato-500);
+}
+
+.checkout-summary__wallet {
+  color: var(--color-olive-500);
+  font-weight: 600;
+}
+
+.checkout-saved-address-note {
+  font-size: 12.5px;
+  color: var(--color-ink-600);
+  margin: 0 0 var(--sp-1);
+}
+
+.checkout-saved-address-note__link {
+  font-weight: 700;
+  color: var(--color-teal-900);
+  text-decoration: underline;
+}

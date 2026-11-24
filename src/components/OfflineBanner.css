@@ -1,0 +1,32 @@
+.offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  min-height: 30px;
+  padding: 4px var(--sp-3);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  padding-top: calc(4px + env(safe-area-inset-top, 0px));
+}
+
+.offline-banner--offline {
+  background: var(--color-mango-500);
+  color: var(--color-ink-900);
+}
+
+.offline-banner--online {
+  background: var(--color-teal-700);
+  color: var(--color-white);
+}
+
+.offline-banner__action {
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 2px var(--sp-3);
+  cursor: pointer;
+}

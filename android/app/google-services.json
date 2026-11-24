@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "729606003654",
+    "project_id": "elmahi-cash-app",
+    "storage_bucket": "elmahi-cash-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729606003654:android:a01f558bcd3641b4e470c7",
+        "android_client_info": {
+          "package_name": "com.elmahi.cashcustomer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvLsiV9DuHo9BgRUPvfGgNsxWfYPP7wKY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

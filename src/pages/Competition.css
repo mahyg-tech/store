@@ -1,0 +1,193 @@
+.competition-page {
+  padding-top: var(--sp-4);
+  padding-bottom: var(--sp-6);
+}
+
+.competition-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-2);
+  padding: var(--sp-10) var(--sp-4);
+}
+
+.competition-empty__title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin-top: var(--sp-2);
+}
+
+/* ---- Hero ---- */
+.competition-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  background: linear-gradient(135deg, var(--color-mango-500), #f9c349 65%, var(--color-mango-500));
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  box-shadow: var(--shadow-card);
+}
+
+.competition-hero__title {
+  color: var(--color-white);
+  font-size: var(--fs-title);
+  font-weight: 800;
+  margin: 0 0 2px;
+}
+
+.competition-hero__subtitle {
+  color: var(--color-white);
+  opacity: 0.92;
+  font-size: var(--fs-caption);
+  margin: 0;
+}
+
+.competition-countdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-ink-400);
+  font-size: var(--fs-caption);
+  margin: 0 0 var(--sp-5);
+}
+
+/* ---- Progress bar: حماسي — تدرج لوني متحرك + أعلام الدرجات ---- */
+.competition-progress {
+  margin-bottom: var(--sp-6);
+}
+
+.competition-progress__track {
+  position: relative;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--color-sand-200);
+  overflow: visible;
+  margin-top: var(--sp-5);
+}
+
+.competition-progress__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--brand), var(--color-mango-500), var(--brand));
+  background-size: 220% 100%;
+  animation: competitionGlow 3s ease-in-out infinite;
+  transition: width 0.5s ease;
+  min-width: 16px;
+}
+
+@keyframes competitionGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.competition-progress__marker {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0;
+  width: 18px;
+  height: 18px;
+  margin-inline-start: -9px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 3px solid var(--color-sand-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+}
+
+.competition-progress__marker--reached {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.competition-progress__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--sp-3);
+  font-weight: 700;
+  font-size: var(--fs-body);
+  color: var(--color-ink-900);
+}
+
+.competition-progress__labels .text-muted {
+  font-weight: 500;
+}
+
+/* ---- Tiers list ---- */
+.competition-page__section-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin: 0 0 var(--sp-3);
+}
+
+.competition-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.competition-tier {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  box-shadow: var(--shadow-card);
+}
+
+.competition-tier--credited {
+  background: var(--brand-tint);
+}
+
+.competition-tier__badge {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-mango-100);
+}
+
+.competition-tier__badge--reached {
+  background: var(--brand);
+}
+
+.competition-tier__label {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin: 0 0 2px;
+}
+
+.competition-tier__detail {
+  font-size: 12px;
+  color: var(--color-ink-400);
+  margin: 0;
+}
+
+.competition-tier__status {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  color: var(--color-ink-400);
+  white-space: nowrap;
+}
+
+.competition-tier__status--done {
+  color: var(--brand-strong);
+  font-weight: 700;
+}

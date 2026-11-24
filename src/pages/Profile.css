@@ -1,0 +1,49 @@
+.profile-hero {
+  background: var(--color-teal-900);
+  color: var(--color-white);
+  padding: calc(var(--canopy-h) + var(--sp-5)) var(--sp-4) var(--sp-6);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.profile-hero__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--color-mango-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.profile-hero__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-title);
+  font-weight: 700;
+}
+
+.profile-menu {
+  margin-top: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.profile-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: none;
+  width: 100%;
+  text-align: right;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-ink-900);
+}

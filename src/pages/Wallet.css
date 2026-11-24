@@ -1,0 +1,103 @@
+.wallet-page {
+  padding-top: var(--sp-4);
+  padding-bottom: var(--sp-6);
+}
+
+.wallet-balance-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  background: var(--color-teal-900);
+  border-radius: 16px;
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+
+.wallet-balance-card__label {
+  color: var(--color-teal-100);
+  font-size: var(--fs-caption);
+  margin: 0 0 2px;
+}
+
+.wallet-balance-card__amount {
+  color: var(--color-white);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.wallet-page__section-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  margin: 0 0 var(--sp-3);
+}
+
+.wallet-transactions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wallet-transactions__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: var(--sp-3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.wallet-transactions__type {
+  font-size: var(--fs-caption);
+  color: var(--color-ink-900);
+  margin: 0 0 2px;
+}
+
+.wallet-transactions__date {
+  font-size: 11.5px;
+  color: var(--color-ink-400);
+  margin: 0;
+}
+
+.wallet-transactions__amount {
+  font-weight: 700;
+  font-size: var(--fs-body);
+  white-space: nowrap;
+}
+
+.wallet-transactions__amount--credit {
+  color: #2f8a4e;
+}
+
+.wallet-transactions__amount--debit {
+  color: #c0392b;
+}
+
+.wallet-topup-status {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.wallet-topup-status--pending {
+  background: #fdf3e0;
+  color: #b8860b;
+}
+
+.wallet-topup-status--approved {
+  background: var(--color-olive-100);
+  color: var(--color-olive-500);
+}
+
+.wallet-topup-status--rejected {
+  background: #fbe9e7;
+  color: #c0392b;
+}

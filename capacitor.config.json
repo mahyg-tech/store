@@ -1,0 +1,8 @@
+{
+  "appId": "com.elmahi.cashcustomer",
+  "appName": "الماحي",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

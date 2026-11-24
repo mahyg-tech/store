@@ -1,0 +1,289 @@
+.voice-assistant-fab {
+  position: fixed;
+  left: var(--sp-4);
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0) + 88px);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--color-teal-900);
+  color: var(--color-white);
+  border: 3px solid var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: var(--shadow-float);
+  z-index: 24;
+  /* قابلة للسحب: touch-action:none بيمنع المتصفح/الـ WebView إنه يسكرول
+     الصفحة وهي بتتسحب (بديل لـ preventDefault في JS، نفس فكرة
+     .tour-blocker)، وcursor:grab بتلمّح للعميل في الديسك توب إنها تتحرك */
+  touch-action: none;
+  cursor: grab;
+  transition: box-shadow 0.15s ease;
+}
+
+.voice-assistant-fab--dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-float), 0 0 0 5px rgba(255, 255, 255, 0.3);
+  transition: none;
+}
+
+.voice-assistant-fab--dragging::after {
+  display: none;
+}
+
+.voice-assistant-fab::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-teal-500);
+  opacity: 0;
+  animation: voice-fab-ring 2.6s ease-out infinite;
+}
+
+@keyframes voice-fab-ring {
+  0% { opacity: 0.55; transform: scale(0.85); }
+  70%, 100% { opacity: 0; transform: scale(1.35); }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Sheet                                                                  */
+/* ---------------------------------------------------------------------- */
+.voice-assistant-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 43, 42, 0);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 45;
+  transition: background 0.25s ease;
+}
+
+.voice-assistant-backdrop--visible {
+  background: rgba(28, 43, 42, 0.5);
+}
+
+.voice-assistant-sheet {
+  width: 100%;
+  max-width: var(--app-max-width);
+  max-height: 82vh;
+  background: var(--color-sand-50);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.voice-assistant-sheet--visible {
+  transform: translateY(0);
+}
+
+.voice-assistant-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-sand-200);
+  flex-shrink: 0;
+}
+
+.voice-assistant-sheet__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--color-teal-100);
+  color: var(--color-teal-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.voice-assistant-sheet__title {
+  font-weight: 700;
+  font-size: var(--fs-body);
+}
+
+.voice-assistant-sheet__close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-sand-100);
+  color: var(--color-ink-600);
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-assistant-sheet__log {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.voice-assistant-msg {
+  max-width: 84%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.voice-assistant-msg--assistant {
+  background: var(--color-white);
+  color: var(--color-ink-900);
+  align-self: flex-start;
+  box-shadow: var(--shadow-card);
+}
+
+.voice-assistant-msg--user {
+  background: var(--color-teal-900);
+  color: var(--color-white);
+  align-self: flex-end;
+}
+
+.voice-assistant-msg--typing {
+  display: flex;
+  gap: 4px;
+  padding: 14px;
+  align-items: center;
+}
+
+.voice-assistant-msg--typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-ink-400);
+  animation: voice-typing-bounce 1.2s infinite ease-in-out;
+}
+
+.voice-assistant-msg--typing span:nth-child(2) { animation-delay: 0.15s; }
+.voice-assistant-msg--typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes voice-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.voice-assistant-options {
+  margin-top: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.voice-assistant-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-sand-200);
+  background: var(--color-sand-50);
+  color: var(--color-ink-900);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  text-align: right;
+}
+
+.voice-assistant-option:active {
+  border-color: var(--color-teal-700);
+}
+
+.voice-assistant-listening-hint {
+  text-align: center;
+  color: var(--color-tomato-500);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  padding: 0 var(--sp-4) var(--sp-2);
+  flex-shrink: 0;
+}
+
+.voice-assistant-sheet__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  padding-bottom: calc(var(--sp-3) + env(safe-area-inset-bottom, 0));
+  background: var(--color-white);
+  border-top: 1px solid var(--color-sand-200);
+  flex-shrink: 0;
+}
+
+.voice-assistant-mic {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-teal-900);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.voice-assistant-mic--live {
+  background: var(--color-tomato-500);
+  animation: voice-mic-pulse 1.4s infinite ease-in-out;
+}
+
+@keyframes voice-mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(214, 69, 80, 0.35); }
+  50% { box-shadow: 0 0 0 10px rgba(214, 69, 80, 0); }
+}
+
+.voice-assistant-textrow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--color-sand-50);
+  border: 1.5px solid var(--color-sand-200);
+  border-radius: var(--radius-pill);
+  padding: 6px 6px 6px 14px;
+}
+
+.voice-assistant-textrow input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--color-ink-900);
+  font-size: var(--fs-body);
+}
+
+.voice-assistant-send {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-olive-500);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.voice-assistant-send:disabled {
+  opacity: 0.5;
+}
